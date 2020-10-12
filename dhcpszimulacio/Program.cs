@@ -133,8 +133,56 @@ namespace dhcpszimulacio
             }
             else
             {
-                Console.WriteLine("Nem oké");
+                //parancs = "release;192.168.10.101"
+                string[] a = parancs.Split(';');
+                string ipcim = a[1];
+                //excluded listából ha van törölni
+                if (excluded.Contains(ipcim))
+                {
+                    excluded.Remove(ipcim);
+                    Console.WriteLine($"Release excluded-ból: {ipcim}");
+                }
+
+                //van-e a reserved dictionary-ba
+                if (reserved.ContainsValue(ipcim))
+                {
+                    Console.WriteLine($"Release reserved-ből: {ipcim}");
+                    string mac = "";
+                    foreach (var r in reserved)
+                    {
+                        if (r.Value == ipcim)
+                        {
+                            mac = r.Key;
+                        }
+                    }
+                    reserved.Remove(mac);
+                    
+                }
+
+                if (dhcp.ContainsValue(ipcim))
+                {
+                    Console.WriteLine($"Release dhcp-ből: {ipcim}");
+                    string mac1 = "";
+                    foreach (var d in dhcp)
+                    {
+                        if (d.Value == ipcim)
+                        {
+                            mac1 = d.Key;
+                        }
+                    }
+                    dhcp.Remove(mac1);
+                }
             }
+        }
+
+        static void FajlbIras()
+        {
+            StreamWriter sw = new StreamWriter("dhcp_kesz.csv");
+            foreach (var d in dhcp)
+            {
+                sw.WriteLine(d.Key+"; "+d.Value);
+            }  
+            sw.Close();
         }
 
         static void Feladatok()
@@ -155,6 +203,7 @@ namespace dhcpszimulacio
 
 
             Feladatok();
+            FajlbIras();
             
             Console.WriteLine("\nVége...");
             Console.ReadKey();
